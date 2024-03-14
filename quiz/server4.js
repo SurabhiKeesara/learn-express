@@ -7,6 +7,7 @@ const port = 8000;
 
 const readUsers = require('./readUsers');
 const writeUsers = require('./writeUsers');
+const { match } = require('assert');
 
 let users;
 fs.readFile(path.resolve(__dirname, '../data/users.json'), function(err, data) {
@@ -41,3 +42,20 @@ app.use('/write', writeUsers);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+app.use('/read/username', addMsgToRequest)
+app.get('/read/username/:name', (req, res) => {
+  let username = req.params.name;
+  let matching_users = req.users.filter(function(user) {
+    return user.username === username
+  })
+  console.log(matching_users);
+  if(matching_users.length === 0) {
+    res.send({
+      error: {message: `${username} does not exist`, status: 400}
+    })
+  }
+  else {
+    res.send(users_with_name);
+  }
+});
